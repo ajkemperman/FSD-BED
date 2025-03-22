@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String   @id @default(uuid()) // Unique ID for each user
+  username        String   @unique              // Unique username
+  password        String                        // Password for authentication
+  name            String                        // User's full name
+  email           String                        // User's email
+  phoneNumber     String                        // User's phone number
+  profilePicture  String                        // URL of picture
+  role            String                        // Role of user (permissions)
+
+  reviews         Review[]                      // One-to-many relationship: A user can create multiple reviews
+  bookings        Booking[]                     // One-to-many relationship: A user can create multiple bookings
+}
+
+model Host {
+  id              String   @id @default(uuid()) // Unique ID for each host
+  username        String   @unique              // Unique username
+  password        String                        // Password for authentication
+  name            String                        // Host's full name
+  email           String                        // Host's email
+  phoneNumber     String                        // Host's phone number
+  profilePicture  String                        // URL of picture
+  aboutMe         String                        // About host
+
+  listings        Property[]                    // One-to-many relationship: A host belongs to multiple properties
+
+}
+
+model Property {
+  id              String   @id @default(uuid())  // Unique ID for each property
+  title           String                         // Title property
+  description     String                         // Description property
+  location        String                         // Location property
+  pricePerNight   Float                          // Price per night property
+  bedroomCount    Int                            // Number of bedrooms property
+  bathRoomCount   Int                            // Number of bathrooms property
+  maxGuestCount   Int                            // Maximum allowed geusts property
+  rating          Int                            // Rating of property
+  image           String                         // Image of property
+  hostId          String                         // Host connected with property
+  amenitiesIds    String                           // Amenities for property Json Array
+  
+  host            Host      @relation(fields: [hostId], references: [id], onDelete: Cascade, onUpdate: Cascade)    // This defines the host of the property, with cascading updates and deletions.
+
+
+  amenities       Amenity[]                      // Many-to-many relationship: Multiple properties belong to multiple amenities
+  bookings        Booking[]                      // One-to-many relationship: A property belongs to multiple bookings
+  reviews         Review[]                       // One-to-many relationship: A property belongs to multiple reviews
+
+  @@index([hostId])
+
+}
+
+model Review {
+  id              String   @id @default(uuid())   // Unique ID for each review
+  rating          Int                             // Rating of review
+  comment         String                          // The comment of review
+  userId          String                          // User connected with review
+  propertyId      String                          // Property connected with review
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)          // This defines the user of the review, with cascading updates and deletions.
+  property        Property @relation(fields: [propertyId], references: [id], onDelete: Cascade, onUpdate: Cascade)      // This defines the property of the review, with cascading updates and deletions.
+
+  @@index([userId])
+  @@index([propertyId])
+
+}
+
+model Booking {
+  id              String   @id @default(uuid())     // Unique ID for each booking
+  checkinDate     DateTime                          // Check in date of booking
+  checkoutDate    DateTime                          // Check out date of booking
+  numberOfGuests  Int                               // Number of guests of booking
+  totalPrice      Float                             // Total price of booking
+  bookingStatus   String                            // Booking status of booking
+  userId          String                            // User connected with booking
+  propertyId      String                            // Property connected with booking
+  
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)          // This defines the user of the booking, with cascading updates and deletions.
+  property        Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade, onUpdate: Cascade)      // This defines the property of the booking, with cascading updates and deletions.
+
+  @@index([userId])
+  @@index([propertyId])
+
+}
+
+model Amenity {
+  id              String    @id @default(uuid())     // Unique ID for each amenity
+  name            String                             // Name of amenity 
+
+  properties      Property[]                         // Many-to-many relationship: Multiple amenities belong to multiple properties
+}
