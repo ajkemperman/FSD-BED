@@ -1,6 +1,7 @@
 import express from "express";
 import * as Sentry from "@sentry/node";
 import "dotenv/config";
+import logosRouter from "./routes/logos.js";
 import usersRouter from "./routes/users.js";
 import hostsRouter from "./routes/hosts.js";
 import propertiesRouter from "./routes/properties.js";
@@ -43,6 +44,7 @@ app.use(log);
 app.use(cors({ origin: "*" })); // Allow all origins
 
 // Resource routes
+app.use("/logos", logosRouter);
 app.use("/users", usersRouter);
 app.use("/hosts", hostsRouter);
 app.use("/properties", propertiesRouter);
