@@ -7,6 +7,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Logo {
+  id              String   @id @default(uuid()) // Unique ID for logo
+  image           String                        // logo
+}
+
 model User {
   id              String   @id @default(uuid()) // Unique ID for each user
   username        String   @unique              // Unique username

@@ -1,10 +1,11 @@
 import { PrismaClient } from "@prisma/client";
-import propertyData from "../data/properties.json" assert { type: "json" };
-import userData from "../data/users.json" assert { type: "json" };
-import reviewData from "../data/reviews.json" assert { type: "json" };
-import hostData from "../data/hosts.json" assert { type: "json" };
-import bookingData from "../data/bookings.json" assert { type: "json" };
-import amenityData from "../data/amenities.json" assert { type: "json" };
+import propertyData from "../data/properties.json" with { type: "json" };
+import userData from "../data/users.json" with  { type: "json" };
+import logoData from "../data/logos.json" with  { type: "json" };
+import reviewData from "../data/reviews.json" with  { type: "json" };
+import hostData from "../data/hosts.json" with  { type: "json" };
+import bookingData from "../data/bookings.json" with  { type: "json" };
+import amenityData from "../data/amenities.json" with  { type: "json" };
 
 const prisma = new PrismaClient({ log: ["query", "info", "warn", "error"] });
 
@@ -15,6 +16,15 @@ async function main() {
   const { hosts } = hostData;
   const { bookings } = bookingData;
   const { amenities } = amenityData;
+  const { logos } = logoData;
+
+  for (const logo of logos) {
+    await prisma.logo.upsert({
+      where: { id: logo.id },
+      update: {},
+      create: logo,
+    });
+  }
 
   // Create user table
 
